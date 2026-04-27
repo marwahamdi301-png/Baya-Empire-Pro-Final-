@@ -1,4 +1,3 @@
-src/auth.py
 import streamlit as st
 
 
