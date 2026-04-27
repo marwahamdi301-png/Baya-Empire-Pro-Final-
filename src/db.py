@@ -430,3 +430,29 @@ def evaluate_alerts(price_map):
                 """,
                 demo_projects
             )
+        # Community Leads / Ambassadors
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS community_leads (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                country TEXT NOT NULL,
+                role TEXT NOT NULL,
+                contact TEXT NOT NULL,
+                message TEXT,
+                created_at TEXT NOT NULL
+            )
+        # Community Leads / Ambassadors
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS community_leads (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                country TEXT NOT NULL,
+                role TEXT NOT NULL,
+                contact TEXT NOT NULL,
+                message TEXT,
+                created_at TEXT NOT NULL
+            )
+            """
+        )
