@@ -1,0 +1,80 @@
+import streamlit as st
+
+st.set_page_config(
+    page_title="Launch Checklist | Baya Empire",
+    page_icon="✅",
+    layout="wide"
+)
+
+from src.ui import setup_style, page_header, metric_card, launch_badge, footer
+from src.config import LEGAL_DISCLAIMER
+
+setup_style()
+
+page_header(
+    "✅ Launch Checklist",
+    "قائمة فحص قبل نشر منصة Baya Empire للناس"
+)
+
+st.warning(LEGAL_DISCLAIMER)
+
+st.markdown(
+    """
+    هذه الصفحة تساعدك على معرفة هل المنصة جاهزة للنشر الأولي أم لا.
+    الهدف الآن هو نشر **MVP تجريبي** وليس إطلاق Token أو جمع أموال.
+    """
+)
+
+st.divider()
+
+checks = {
+    "الكود يعمل محلياً بدون أخطاء": st.checkbox("الكود يعمل محلياً بدون أخطاء"),
+    "requirements.txt موجود": st.checkbox("requirements.txt موجود"),
+    "لا توجد API Keys داخل الكود": st.checkbox("لا توجد API Keys داخل الكود"),
+    "ADMIN_PASSWORD موجود في Streamlit Secrets": st.checkbox("ADMIN_PASSWORD موجود في Streamlit Secrets"),
+    "صفحة Africa Impact واضحة": st.checkbox("صفحة Africa Impact واضحة"),
+    "صفحة Whitepaper موجودة": st.checkbox("صفحة Whitepaper موجودة"),
+    "تنبيه قانوني موجود": st.checkbox("تنبيه قانوني موجود"),
+    "لا توجد وعود أرباح": st.checkbox("لا توجد وعود أرباح"),
+    "GitHub Repo جاهز": st.checkbox("GitHub Repo جاهز"),
+    "Streamlit App Public أو قابل للمشاركة": st.checkbox("Streamlit App Public أو قابل للمشاركة"),
+}
+
+done = sum(1 for v in checks.values() if v)
+total = len(checks)
+progress = done / total
+
+st.progress(progress)
+
+c1, c2, c3 = st.columns(3)
+
+with c1:
+    metric_card("المكتمل", f"{done}/{total}", "عدد البنود الجاهزة", "#00f2ff")
+
+with c2:
+    metric_card("نسبة الجاهزية", f"{progress * 100:.0f}%", "Launch Readiness", "#ffaa00")
+
+with c3:
+    status = "جاهز" if progress >= 0.85 else "قيد التطوير"
+    color = "#00ff88" if progress >= 0.85 else "#ffaa00"
+    metric_card("الحالة", status, "للنشر الأولي", color)
+
+st.divider()
+
+st.markdown("## تقييم سريع")
+
+if progress >= 0.85:
+    st.success("المنصة جاهزة تقريباً للنشر الأولي MVP.")
+elif progress >= 0.60:
+    st.warning("المنصة قريبة من الجاهزية، لكن تحتاج بعض التعديلات قبل النشر.")
+else:
+    st.error("لا أنصح بالنشر الآن. أكمل البنود الأساسية أولاً.")
+
+st.divider()
+
+st.markdown("## حالة المكونات")
+
+for label, checked in checks.items():
+    launch_badge(label, "جاهز" if checked else "غير جاهز")
+
+footer()
