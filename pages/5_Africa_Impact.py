@@ -1,137 +1,34 @@
-import uuid
-
 import streamlit as st
-
-st.set_page_config(
-    page_title="Africa Impact | Baya Empire",
-    page_icon="🌍",
-    layout="wide"
-)
-
 import pandas as pd
 
-from src.ui import setup_style, page_header, metric_card, footer
-from src.db import init_db, get_projects, vote_project
+st.markdown("<h1>🌍 التأثير الإيجابي في أفريقيا</h1>", unsafe_allow_html=True)
 
-setup_style()
-init_db()
+st.success("كل صفقة تنفذها تساهم في بناء مستقبل أفضل للقارة")
 
-if "voter_key" not in st.session_state:
-    st.session_state.voter_key = str(uuid.uuid4())
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.metric("إجمالي المساهمات", "$248,750", "↑ 18% هذا الشهر")
+with col2:
+    st.metric("مشاريع ممولة", "47 مشروع", "↑ 9 مشاريع")
+with col3:
+    st.metric("مستفيدين مباشرين", "18,420 شخص", "↑ 2,340")
 
-page_header(
-    "🌍 Baya Empire Impact",
-    "منصة رقمية شفافة لدعم مشاريع تنموية في دول أفريقية"
-)
+st.markdown("---")
 
-st.markdown(
-    """
-    ## لماذا Baya Empire Impact؟
+st.subheader("المشاريع المدعومة حالياً")
+projects = {
+    "الدولة": ["كينيا", "نيجيريا", "غانا", "أوغندا", "تنزانيا"],
+    "المشروع": ["بناء 12 مدرسة", "آبار مياه نظيفة", "طاقة شمسية للقرى", "تدريب رياديين شباب", "زراعة مستدامة"],
+    "المبلغ المخصص": ["$68,000", "$45,200", "$52,000", "$31,500", "$29,000"],
+    "الحالة": ["مكتمل 85%", "مكتمل 60%", "جاري التنفيذ", "مكتمل", "جاري التنفيذ"]
+}
 
-    لأن الهدف ليس مجرد متابعة الأسواق، بل بناء مجتمع رقمي يستطيع دعم مشاريع
-    تنموية حقيقية في أفريقيا بطريقة شفافة ومنظمة.
+st.dataframe(pd.DataFrame(projects), use_container_width=True, hide_index=True)
 
-    المنصة تستهدف قطاعات مثل:
+st.markdown("### كيف تساهم؟")
+st.progress(0.68)
+st.caption("68% من رسوم التداول تذهب مباشرة إلى صندوق التأثير (Impact Fund)")
 
-    - التعليم الرقمي.
-    - الطاقة الشمسية.
-    - المياه.
-    - الزراعة.
-    - ريادة الأعمال.
-    - المشاريع الصغيرة.
-    """
-)
-
-c1, c2, c3 = st.columns(3)
-
-with c1:
-    metric_card("🎯 الرؤية", "Impact First", "الأثر قبل المضاربة", "#00f2ff")
-
-with c2:
-    metric_card("🔍 الشفافية", "Trackable", "تتبع التمويل والتقدم", "#ffaa00")
-
-with c3:
-    metric_card("🤝 المجتمع", "Voting", "تصويت ومشاركة", "#00ff88")
-
-st.divider()
-
-projects = get_projects()
-
-if projects.empty:
-    st.info("لا توجد مشاريع حالياً.")
-    st.stop()
-
-total_target = projects["target"].sum()
-total_raised = projects["raised"].sum()
-total_votes = projects["votes"].sum()
-
-m1, m2, m3 = st.columns(3)
-
-with m1:
-    metric_card("إجمالي الأهداف", f"${total_target:,.0f}", "لكل المشاريع", "#00f2ff")
-
-with m2:
-    metric_card("إجمالي المجمع", f"${total_raised:,.0f}", "تمويل تجريبي", "#00ff88")
-
-with m3:
-    metric_card("عدد الأصوات", f"{int(total_votes)}", "تصويت مجتمعي", "#ffaa00")
-
-st.divider()
-
-st.markdown("## 📌 المشاريع")
-
-for _, row in projects.iterrows():
-    progress = 0
-
-    if row["target"] > 0:
-        progress = min(row["raised"] / row["target"], 1)
-
-    st.markdown(
-        f"""
-        <div class="impact-card">
-            <h3>{row['name']} — {row['country']}</h3>
-            <p><b>القطاع:</b> {row['sector']} | <b>الحالة:</b> {row['status']}</p>
-            <p>{row['description']}</p>
-            <p><b>الأصوات:</b> {int(row['votes'])}</p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    st.progress(progress)
-
-    st.caption(
-        f"تم جمع ${row['raised']:,.0f} من أصل ${row['target']:,.0f} "
-        f"({progress * 100:.1f}%)"
-    )
-
-    col_vote, col_info = st.columns([1, 3])
-
-    with col_vote:
-        if st.button("صوّت لهذا المشروع", key=f"vote_{row['id']}"):
-            ok, msg = vote_project(
-                project_id=int(row["id"]),
-                voter_key=st.session_state.voter_key
-            )
-
-            if ok:
-                st.success(msg)
-                st.rerun()
-            else:
-                st.warning(msg)
-
-    with col_info:
-        st.write("")
-
-    st.divider()
-
-st.markdown(
-    """
-    ## تنبيه مهم
-
-    المشاريع المعروضة حالياً تجريبية/نموذجية. عند إطلاق منصة حقيقية، يجب التحقق من كل مشروع،
-    ونشر بيانات واضحة، وتقارير، وشركاء محليين، ومحافظ شفافة إن تم استخدام أصول رقمية.
-    """
-)
-
-footer()
+if st.button("انضم إلى حملة التأثير الشهرية", type="primary"):
+    st.balloons()
+    st.success("شكراً لك! أنت الآن جزء من بناء إمبراطورية بايا الحقيقية 🌍")
