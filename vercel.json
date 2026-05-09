@@ -1,8 +1,8 @@
 {
-  "routes": [
+  "rewrites": [
     {
-      "src": "(.*)",
-      "dest": "app.py"
+      "source": "/validation-key.txt",
+      "destination": "/public/validation-key.txt"
     }
   ]
 }
