@@ -1,8 +1,5 @@
 {
-  "rewrites": [
-    {
-      "source": "/validation-key.txt",
-      "destination": "/public/validation-key.txt"
-    }
-  ]
+  "version": 2,
+  "builds": [{ "src": "app.py", "use": "@vercel/python" }],
+  "routes": [{ "src": "/(.*)", "dest": "app.py" }]
 }
